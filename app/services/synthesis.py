@@ -72,17 +72,19 @@ def generate_digest(
     errors = []
 
     try:
-        # Collect ingested newsletters for this period
+        # Collect ingested newsletters for this period (cap at 100 most recent)
         if cadence == "weekly":
             newsletters = db.execute(
                 "SELECT id, raw_content, content_type, parsed_articles, parse_status "
-                "FROM ingested_newsletters WHERE user_id = ? AND ingested_week = ?",
+                "FROM ingested_newsletters WHERE user_id = ? AND ingested_week = ? "
+                "ORDER BY ingested_at DESC LIMIT 100",
                 (user_id, period_key),
             ).fetchall()
         else:
             newsletters = db.execute(
                 "SELECT id, raw_content, content_type, parsed_articles, parse_status "
-                "FROM ingested_newsletters WHERE user_id = ? AND ingested_date = ?",
+                "FROM ingested_newsletters WHERE user_id = ? AND ingested_date = ? "
+                "ORDER BY ingested_at DESC LIMIT 100",
                 (user_id, period_key),
             ).fetchall()
 
@@ -109,6 +111,9 @@ def generate_digest(
                     )
 
         db.commit()
+
+        # Cap articles to avoid timeouts with large feeds
+        all_articles = all_articles[:50]
 
         # Try LLM synthesis
         llm = get_llm_service()

@@ -1,4 +1,5 @@
 import json
+import threading
 
 from fastapi import APIRouter, Depends, HTTPException
 
@@ -51,6 +52,20 @@ def get_current_digest(user=Depends(get_current_user), db=Depends(get_db)):
     )
 
 
+@router.get("/digest/status/{digest_id}")
+def get_digest_status(
+    digest_id: int, user=Depends(get_current_user), db=Depends(get_db)
+):
+    """Poll digest generation status."""
+    row = db.execute(
+        "SELECT status, story_count FROM digests WHERE id = ? AND user_id = ?",
+        (digest_id, user["id"]),
+    ).fetchone()
+    if not row:
+        raise HTTPException(404, "Digest not found")
+    return {"digest_id": digest_id, "status": row["status"], "story_count": row["story_count"]}
+
+
 @router.get("/digest/{period_key}", response_model=DigestResponse)
 def get_digest_by_period(
     period_key: str, user=Depends(get_current_user), db=Depends(get_db)
@@ -75,6 +90,13 @@ def get_digest_by_period(
     )
 
 
+def _run_generation_thread(user_id: int, period_key: str, cadence: str, force: bool):
+    """Run digest generation in a background thread with its own DB connection."""
+    from app.database import get_connection
+
+    db = get_connection()
+    generate_digest(db, user_id, period_key, cadence, force)
+
 
 @router.post("/digest/generate", response_model=GenerateResponse)
 def trigger_generation(
@@ -98,10 +120,26 @@ def trigger_generation(
     if existing and not req.force:
         return GenerateResponse(status="already_exists", digest_id=existing["id"])
 
-    # Run generation synchronously — fast without LLM, acceptable with LLM
-    digest_id = generate_digest(db, user["id"], period_key, cadence, req.force)
+    # Create or reset digest record so we have an ID to return
+    if existing:
+        digest_id = existing["id"]
+        db.execute(
+            "UPDATE digests SET status = 'generating' WHERE id = ?", (digest_id,)
+        )
+    else:
+        cur = db.execute(
+            "INSERT INTO digests (user_id, cadence, period_key, status) VALUES (?, ?, ?, 'generating')",
+            (user["id"], cadence, period_key),
+        )
+        digest_id = cur.lastrowid
+    db.commit()
 
-    # Get final status
-    row = db.execute("SELECT status FROM digests WHERE id = ?", (digest_id,)).fetchone()
-    status = row["status"] if row else "complete"
-    return GenerateResponse(status=status, digest_id=digest_id)
+    # Run in a background thread (gets its own DB connection)
+    t = threading.Thread(
+        target=_run_generation_thread,
+        args=(user["id"], period_key, cadence, req.force),
+        daemon=True,
+    )
+    t.start()
+
+    return GenerateResponse(status="generating", digest_id=digest_id)
