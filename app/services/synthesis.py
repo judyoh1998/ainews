@@ -72,19 +72,25 @@ def generate_digest(
     errors = []
 
     try:
-        # Collect ingested newsletters for this period (cap at 100 most recent)
+        # Collect ingested newsletters for this period, filtered to active sources only
         if cadence == "weekly":
             newsletters = db.execute(
-                "SELECT id, raw_content, content_type, parsed_articles, parse_status "
-                "FROM ingested_newsletters WHERE user_id = ? AND ingested_week = ? "
-                "ORDER BY ingested_at DESC LIMIT 100",
+                "SELECT n.id, n.raw_content, n.content_type, n.parsed_articles, n.parse_status "
+                "FROM ingested_newsletters n "
+                "LEFT JOIN sources s ON n.source_id = s.id "
+                "WHERE n.user_id = ? AND n.ingested_week = ? "
+                "AND (n.source_id IS NULL OR s.active = 1) "
+                "ORDER BY n.ingested_at DESC LIMIT 100",
                 (user_id, period_key),
             ).fetchall()
         else:
             newsletters = db.execute(
-                "SELECT id, raw_content, content_type, parsed_articles, parse_status "
-                "FROM ingested_newsletters WHERE user_id = ? AND ingested_date = ? "
-                "ORDER BY ingested_at DESC LIMIT 100",
+                "SELECT n.id, n.raw_content, n.content_type, n.parsed_articles, n.parse_status "
+                "FROM ingested_newsletters n "
+                "LEFT JOIN sources s ON n.source_id = s.id "
+                "WHERE n.user_id = ? AND n.ingested_date = ? "
+                "AND (n.source_id IS NULL OR s.active = 1) "
+                "ORDER BY n.ingested_at DESC LIMIT 100",
                 (user_id, period_key),
             ).fetchall()
 
