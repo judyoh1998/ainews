@@ -379,12 +379,42 @@ async function doFetchRss() {
     if (result.errors.length > 0) {
       msg += ` (${result.errors.length} errors)`;
     }
-    statusEl.textContent = msg;
-    statusEl.className = 'nk-status-msg ok';
+
+    if (result.total_new > 0) {
+      // Auto-generate digest from new articles
+      statusEl.textContent = msg + ' Generating digest...';
+      await api('/digest/generate', {
+        method: 'POST',
+        body: JSON.stringify({ force: true }),
+      });
+      // Wait for background generation, then refresh feed
+      statusEl.textContent = msg + ' Building digest...';
+      setTimeout(async () => {
+        try {
+          const [digestData, quizData] = await Promise.all([
+            api('/digest'),
+            api('/quiz'),
+          ]);
+          stories = digestData.stories || [];
+          digestStatus = digestData.status;
+          quiz = quizData.questions || [];
+          buildGrid();
+          buildQuiz();
+          statusEl.textContent = msg + ` Digest updated with ${stories.length} stories!`;
+        } catch (e) {
+          statusEl.textContent = msg + ' Digest refresh failed: ' + e.message;
+          statusEl.className = 'nk-status-msg err';
+        }
+        btn.disabled = false;
+      }, 3000);
+    } else {
+      statusEl.textContent = msg;
+      statusEl.className = 'nk-status-msg ok';
+      btn.disabled = false;
+    }
   } catch (e) {
     statusEl.textContent = 'Fetch error: ' + e.message;
     statusEl.className = 'nk-status-msg err';
-  } finally {
     btn.disabled = false;
   }
 }

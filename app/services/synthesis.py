@@ -115,10 +115,9 @@ def generate_digest(
         if llm.available and all_articles:
             stories, quiz = _llm_pipeline(llm, all_articles, period_key, cadence, errors)
         elif all_articles:
-            # No LLM key but have articles — use seed data as fallback
-            errors.append("No API key configured, using seed data")
-            stories = SEED_STORIES
-            quiz = SEED_QUIZ
+            # No LLM key — build stories directly from articles
+            errors.append("No API key configured, using articles as-is")
+            stories, quiz = _articles_to_stories(all_articles)
         else:
             # No articles ingested — use seed data
             stories = SEED_STORIES
@@ -256,5 +255,65 @@ def _llm_pipeline(
     except Exception as e:
         errors.append(f"Quiz generation failed: {e}")
         # Quiz failure is non-fatal; digest still usable
+
+    return stories, quiz
+
+
+def _articles_to_stories(
+    articles: list[dict],
+) -> tuple[list[dict], list[dict]]:
+    """Convert raw articles into story format without LLM.
+
+    Takes up to 9 articles and maps them directly into the story schema.
+    All three difficulty levels get the same text since we can't rewrite without an LLM.
+    """
+    stories = []
+    seen_titles = set()
+    for article in articles:
+        title = article.get("title", "").strip().lstrip("#").strip()
+        body = article.get("body", "").strip()
+        if not title and not body:
+            continue
+        # Basic dedup by title
+        title_lower = title.lower()
+        if title_lower in seen_titles:
+            continue
+        seen_titles.add(title_lower)
+
+        headline = title[:120] if title else body[:80] + "..."
+        text = body if body else title
+        # Truncate for display
+        short = text[:200] + ("..." if len(text) > 200 else "")
+        med = text[:500] + ("..." if len(text) > 500 else "")
+        full = text[:1000] + ("..." if len(text) > 1000 else "")
+
+        stories.append({
+            "rank": len(stories) + 1,
+            "headline": headline,
+            "tag": "NEWS",
+            "easy": short,
+            "medium": med,
+            "pro": full,
+            "sources": [article.get("url", "")] if article.get("url") else [],
+        })
+        if len(stories) >= 9:
+            break
+
+    # Generate simple quiz from the stories
+    quiz = []
+    for i, s in enumerate(stories[:4]):
+        quiz.append({
+            "id": i + 1,
+            "story_rank": s["rank"],
+            "question": f"What was the topic of: {s['headline'][:60]}...?",
+            "options": [
+                f"A) {s['easy'][:50]}...",
+                "B) An unrelated sports event",
+                "C) A new cooking recipe",
+                "D) A weather forecast update",
+            ],
+            "correct_index": 0,
+            "explanation": f"This story was about: {s['headline']}",
+        })
 
     return stories, quiz
