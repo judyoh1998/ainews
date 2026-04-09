@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     llm_max_retries: int = 3
     llm_timeout: int = 120
 
-    model_config = {"env_prefix": "NEKO_", "env_file": ".env"}
+    model_config = {"env_prefix": "NEKO_", "env_file": ".env", "extra": "ignore"}
 
 
 settings = Settings()
