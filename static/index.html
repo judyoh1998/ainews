@@ -61,17 +61,38 @@
   <div id="quiz" class="nk-quiz-wrap"></div>
 
   <div id="src" style="display:none;padding:16px;">
-    <div class="nk-src-section">SELECT YOUR SOURCES</div>
+    <!-- RSS Feed Catalog -->
+    <div class="nk-src-section">RSS FEED CATALOG</div>
+    <div id="rssCatalog" class="nk-catalog"></div>
+
+    <!-- Add Custom RSS -->
+    <div class="nk-src-section" style="margin-top:16px;">ADD CUSTOM RSS FEED</div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;align-items:center;flex-wrap:wrap;">
+      <input type="text" id="customRssName" placeholder="Feed name" class="nk-input-field" style="flex:0 0 140px;">
+      <input type="url" id="customRssUrl" placeholder="https://example.com/feed.xml" class="nk-input-field" style="flex:1;min-width:180px;">
+      <button class="nk-ingest-btn" onclick="addCustomRss()">ADD</button>
+    </div>
+
+    <!-- My Sources -->
+    <div class="nk-src-section">MY SOURCES</div>
     <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;" id="srcChips"></div>
 
+    <!-- Fetch Latest -->
+    <div style="margin-bottom:16px;">
+      <button class="nk-ingest-btn" onclick="doFetchRss()" id="fetchBtn">FETCH LATEST FROM RSS</button>
+      <span id="fetchStatus" class="nk-status-msg"></span>
+    </div>
+
+    <!-- Digest Cadence -->
     <div class="nk-src-section">DIGEST CADENCE</div>
     <div style="display:flex;gap:8px;margin-bottom:16px;" id="cadenceBtns">
       <button class="nk-cadence-btn" data-val="daily" onclick="setCadence('daily')">DAILY</button>
       <button class="nk-cadence-btn" data-val="weekly" onclick="setCadence('weekly')">WEEKLY</button>
     </div>
 
+    <!-- Manual Paste -->
     <div class="nk-ingest-area">
-      <div class="nk-src-section">PASTE NEWSLETTER CONTENT</div>
+      <div class="nk-src-section">OR PASTE NEWSLETTER CONTENT</div>
       <textarea id="ingestText" placeholder="Paste newsletter text or HTML here..."></textarea>
       <div>
         <button class="nk-ingest-btn" onclick="doIngest()" id="ingestBtn">INGEST</button>

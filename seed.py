@@ -4,7 +4,7 @@ import json
 
 from app.auth import _hash_password
 from app.database import get_connection, init_db
-from app.services.seed_data import SEED_QUIZ, SEED_SOURCES, SEED_STORIES
+from app.services.seed_data import RSS_CATALOG, SEED_QUIZ, SEED_SOURCES, SEED_STORIES
 
 
 def seed():
@@ -31,6 +31,13 @@ def seed():
         conn.execute(
             "INSERT OR IGNORE INTO sources (user_id, name, source_type) VALUES (1, ?, ?)",
             (s["name"], s["source_type"]),
+        )
+
+    # Seed RSS catalog sources
+    for s in RSS_CATALOG:
+        conn.execute(
+            "INSERT OR IGNORE INTO sources (user_id, name, url, source_type) VALUES (1, ?, ?, ?)",
+            (s["name"], s["url"], s["source_type"]),
         )
 
     # Seed digest

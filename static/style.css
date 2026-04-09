@@ -441,6 +441,63 @@ body {
   margin-left: 8px;
 }
 
+/* ── RSS Catalog ── */
+.nk-catalog {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.nk-catalog-group-title {
+  font-size: 7px;
+  color: #9d174d;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  letter-spacing: 1px;
+}
+.nk-catalog-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.nk-catalog-item {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
+  padding: 6px 10px;
+  border-radius: 20px;
+  cursor: pointer;
+  border: 1.5px solid #f9a8d4;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.nk-catalog-item.subscribed {
+  background: linear-gradient(90deg, #ec4899, #f472b6);
+  color: #fff;
+}
+.nk-catalog-item.available {
+  background: #fdf2f8;
+  color: #be185d;
+}
+.nk-catalog-item:hover { transform: scale(1.03); }
+
+/* ── Custom RSS Input ── */
+.nk-input-field {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  padding: 8px 10px;
+  border: 1.5px solid #f9a8d4;
+  border-radius: 8px;
+  background: #fdf2f8;
+  color: #831843;
+  outline: none;
+}
+.nk-input-field:focus {
+  border-color: #ec4899;
+  box-shadow: 0 0 0 2px rgba(236,72,153,0.2);
+}
+
 /* ── Sparkles ── */
 .nk-sparkle {
   position: absolute;

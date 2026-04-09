@@ -146,3 +146,88 @@ SEED_SOURCES = [
     {"name": "Stratechery", "source_type": "newsletter"},
     {"name": "Lenny's", "source_type": "newsletter"},
 ]
+
+RSS_CATALOG = [
+    # News outlets
+    {
+        "name": "MIT Technology Review - AI",
+        "url": "https://www.technologyreview.com/topic/artificial-intelligence/feed",
+        "source_type": "rss",
+        "category": "news",
+    },
+    {
+        "name": "TechCrunch - AI",
+        "url": "https://techcrunch.com/category/artificial-intelligence/feed/",
+        "source_type": "rss",
+        "category": "news",
+    },
+    {
+        "name": "The Verge - AI",
+        "url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
+        "source_type": "rss",
+        "category": "news",
+    },
+    {
+        "name": "Ars Technica - AI",
+        "url": "https://feeds.arstechnica.com/arstechnica/features",
+        "source_type": "rss",
+        "category": "news",
+    },
+    # AI Labs
+    {
+        "name": "OpenAI Blog",
+        "url": "https://openai.com/blog/rss.xml",
+        "source_type": "rss",
+        "category": "labs",
+    },
+    {
+        "name": "Anthropic News",
+        "url": "https://www.anthropic.com/rss.xml",
+        "source_type": "rss",
+        "category": "labs",
+    },
+    {
+        "name": "Google AI Blog",
+        "url": "https://blog.google/technology/ai/rss/",
+        "source_type": "rss",
+        "category": "labs",
+    },
+    {
+        "name": "Hugging Face Blog",
+        "url": "https://huggingface.co/blog/feed.xml",
+        "source_type": "rss",
+        "category": "labs",
+    },
+    {
+        "name": "DeepMind Blog",
+        "url": "https://deepmind.google/blog/rss.xml",
+        "source_type": "rss",
+        "category": "labs",
+    },
+    {
+        "name": "Meta AI Blog",
+        "url": "https://ai.meta.com/blog/rss/",
+        "source_type": "rss",
+        "category": "labs",
+    },
+    # Community
+    {
+        "name": "r/MachineLearning",
+        "url": "https://www.reddit.com/r/MachineLearning/.rss",
+        "source_type": "rss",
+        "category": "community",
+    },
+    {
+        "name": "r/artificial",
+        "url": "https://www.reddit.com/r/artificial/.rss",
+        "source_type": "rss",
+        "category": "community",
+    },
+    # Research
+    {
+        "name": "ArXiv CS.AI",
+        "url": "https://rss.arxiv.org/rss/cs.AI",
+        "source_type": "rss",
+        "category": "research",
+    },
+]

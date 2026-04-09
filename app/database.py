@@ -93,6 +93,19 @@ def get_connection() -> sqlite3.Connection:
 def init_db():
     conn = get_connection()
     conn.executescript(SCHEMA_SQL)
+    # Migrations for new columns (safe to run repeatedly)
+    for stmt in [
+        "ALTER TABLE ingested_newsletters ADD COLUMN entry_url TEXT",
+        "ALTER TABLE sources ADD COLUMN last_fetched_at TEXT",
+    ]:
+        try:
+            conn.execute(stmt)
+        except sqlite3.OperationalError:
+            pass  # Column already exists
+    conn.execute(
+        "CREATE UNIQUE INDEX IF NOT EXISTS idx_newsletters_user_entry_url "
+        "ON ingested_newsletters(user_id, entry_url) WHERE entry_url IS NOT NULL"
+    )
     conn.commit()
 
 

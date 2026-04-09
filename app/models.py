@@ -105,6 +105,7 @@ class SourceResponse(BaseModel):
     source_type: str
     active: bool
     created_at: str
+    last_fetched_at: Optional[str] = None
 
 
 # ── Ingest ──
@@ -146,6 +147,25 @@ class GenerateRequest(BaseModel):
 class GenerateResponse(BaseModel):
     status: str
     digest_id: int
+
+
+# ── RSS Fetch ──
+
+
+class FetchResult(BaseModel):
+    source_id: int
+    name: str
+    new: int
+    skipped: int
+    error: Optional[str] = None
+
+
+class FetchResponse(BaseModel):
+    sources_fetched: int
+    total_new: int
+    total_skipped: int
+    errors: list[str]
+    results: list[FetchResult]
 
 
 # Forward ref fix

@@ -113,6 +113,7 @@ async function enterApp() {
     buildGrid();
     buildQuiz();
     loadSources();
+    loadCatalog();
     updateCadenceUI();
     initCats();
   } catch (e) {
@@ -235,13 +236,14 @@ async function loadSources() {
     const chips = document.getElementById('srcChips');
     chips.innerHTML = '';
     if (!srcs.length) {
-      chips.innerHTML = '<div style="font-size:7px;color:#9d174d;">No sources yet. They\'ll be created when you generate your first digest.</div>';
+      chips.innerHTML = '<div style="font-size:7px;color:#9d174d;">No sources yet. Browse the catalog above to subscribe!</div>';
       return;
     }
     srcs.forEach(s => {
       const c = document.createElement('div');
       c.className = 'nk-chip ' + (s.active ? 'active' : 'inactive');
-      c.textContent = s.name;
+      const typeIcon = s.source_type === 'rss' ? '\u{1F4E1} ' : '';
+      c.textContent = typeIcon + s.name;
       c.onclick = () => toggleSource(s.id, !s.active, c);
       chips.appendChild(c);
     });
@@ -259,6 +261,131 @@ async function toggleSource(id, active, el) {
     el.className = 'nk-chip ' + (active ? 'active' : 'inactive');
   } catch (e) {
     console.error('Failed to toggle source:', e);
+  }
+}
+
+// ── RSS Catalog ──
+async function loadCatalog() {
+  try {
+    const catalog = await api('/sources/catalog');
+    const container = document.getElementById('rssCatalog');
+    container.innerHTML = '';
+
+    const groups = {};
+    catalog.forEach(entry => {
+      const cat = entry.category || 'other';
+      if (!groups[cat]) groups[cat] = [];
+      groups[cat].push(entry);
+    });
+
+    const categoryLabels = {
+      news: 'NEWS OUTLETS',
+      labs: 'AI LABS',
+      community: 'COMMUNITY',
+      research: 'RESEARCH',
+    };
+
+    for (const [cat, entries] of Object.entries(groups)) {
+      const groupDiv = document.createElement('div');
+      const title = document.createElement('div');
+      title.className = 'nk-catalog-group-title';
+      title.textContent = categoryLabels[cat] || cat.toUpperCase();
+      groupDiv.appendChild(title);
+
+      const chipsDiv = document.createElement('div');
+      chipsDiv.className = 'nk-catalog-group';
+
+      entries.forEach(entry => {
+        const chip = document.createElement('div');
+        chip.className = 'nk-catalog-item ' + (entry.subscribed ? 'subscribed' : 'available');
+        chip.textContent = (entry.subscribed ? '\u2713 ' : '+ ') + entry.name;
+        chip.onclick = () => toggleCatalogSubscription(entry, chip);
+        chipsDiv.appendChild(chip);
+      });
+
+      groupDiv.appendChild(chipsDiv);
+      container.appendChild(groupDiv);
+    }
+  } catch (e) {
+    console.error('Failed to load catalog:', e);
+  }
+}
+
+async function toggleCatalogSubscription(entry, chip) {
+  try {
+    if (chip.classList.contains('subscribed')) {
+      // Unsubscribe: find and delete this source
+      const sources = await api('/sources');
+      const match = sources.find(s => s.url === entry.url);
+      if (match) {
+        await api(`/sources/${match.id}`, { method: 'DELETE' });
+      }
+      chip.className = 'nk-catalog-item available';
+      chip.textContent = '+ ' + entry.name;
+    } else {
+      // Subscribe
+      await api('/sources', {
+        method: 'POST',
+        body: JSON.stringify({ name: entry.name, url: entry.url, source_type: 'rss' }),
+      });
+      chip.className = 'nk-catalog-item subscribed';
+      chip.textContent = '\u2713 ' + entry.name;
+    }
+    loadSources();
+  } catch (e) {
+    if (e.message.includes('Already subscribed')) {
+      chip.className = 'nk-catalog-item subscribed';
+      chip.textContent = '\u2713 ' + entry.name;
+    } else {
+      console.error('Subscription toggle failed:', e);
+    }
+  }
+}
+
+// ── Custom RSS ──
+async function addCustomRss() {
+  const nameEl = document.getElementById('customRssName');
+  const urlEl = document.getElementById('customRssUrl');
+  const url = urlEl.value.trim();
+  if (!url) return;
+  const name = nameEl.value.trim() || new URL(url).hostname;
+
+  try {
+    await api('/sources', {
+      method: 'POST',
+      body: JSON.stringify({ name, url, source_type: 'rss' }),
+    });
+    nameEl.value = '';
+    urlEl.value = '';
+    loadSources();
+    loadCatalog();
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
+}
+
+// ── Fetch RSS ──
+async function doFetchRss() {
+  const btn = document.getElementById('fetchBtn');
+  const statusEl = document.getElementById('fetchStatus');
+  btn.disabled = true;
+  statusEl.className = 'nk-status-msg ok';
+  statusEl.textContent = 'Fetching feeds...';
+  statusEl.style.display = 'inline-block';
+
+  try {
+    const result = await api('/sources/fetch', { method: 'POST' });
+    let msg = `Fetched ${result.sources_fetched} feeds: ${result.total_new} new, ${result.total_skipped} skipped.`;
+    if (result.errors.length > 0) {
+      msg += ` (${result.errors.length} errors)`;
+    }
+    statusEl.textContent = msg;
+    statusEl.className = 'nk-status-msg ok';
+  } catch (e) {
+    statusEl.textContent = 'Fetch error: ' + e.message;
+    statusEl.className = 'nk-status-msg err';
+  } finally {
+    btn.disabled = false;
   }
 }
 
