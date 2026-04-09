@@ -283,6 +283,7 @@ async function loadCatalog() {
       labs: 'AI LABS',
       community: 'COMMUNITY',
       research: 'RESEARCH',
+      twitter: 'TWITTER/X (VIA NITTER)',
     };
 
     for (const [cat, entries] of Object.entries(groups)) {

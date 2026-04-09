@@ -230,4 +230,47 @@ RSS_CATALOG = [
         "source_type": "rss",
         "category": "research",
     },
+    # Twitter/X via Nitter (may be unreliable — depends on instance availability)
+    {
+        "name": "@karpathy",
+        "url": "https://nitter.poast.org/karpathy/rss",
+        "source_type": "rss",
+        "category": "twitter",
+    },
+    {
+        "name": "@sama",
+        "url": "https://nitter.poast.org/sama/rss",
+        "source_type": "rss",
+        "category": "twitter",
+    },
+    {
+        "name": "@ylecun",
+        "url": "https://nitter.poast.org/ylecun/rss",
+        "source_type": "rss",
+        "category": "twitter",
+    },
+    {
+        "name": "@OpenAI",
+        "url": "https://nitter.poast.org/OpenAI/rss",
+        "source_type": "rss",
+        "category": "twitter",
+    },
+    {
+        "name": "@AnthropicAI",
+        "url": "https://nitter.poast.org/AnthropicAI/rss",
+        "source_type": "rss",
+        "category": "twitter",
+    },
+    {
+        "name": "@GoogleAI",
+        "url": "https://nitter.poast.org/GoogleAI/rss",
+        "source_type": "rss",
+        "category": "twitter",
+    },
+    {
+        "name": "@huggingface",
+        "url": "https://nitter.poast.org/huggingface/rss",
+        "source_type": "rss",
+        "category": "twitter",
+    },
 ]
