@@ -118,8 +118,8 @@ def generate_digest(
 
         db.commit()
 
-        # Cap articles to avoid timeouts with large feeds
-        all_articles = all_articles[:50]
+        # Pick the 20 most recent articles
+        all_articles = all_articles[:20]
 
         # Try LLM synthesis
         llm = get_llm_service()
