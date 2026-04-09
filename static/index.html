@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neko News — AI Digest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<!-- Auth Screen -->
+<div id="authScreen" class="nk-auth">
+  <div style="font-size:20px;color:#ec4899;text-shadow:2px 2px 0 #9d174d;margin-bottom:4px;">✦ NEKO NEWS ✦</div>
+  <div style="font-size:8px;color:#be185d;margin-bottom:12px;">AI DIGEST</div>
+
+  <div class="nk-auth-box" id="loginBox">
+    <h2>LOGIN</h2>
+    <div class="nk-auth-error" id="loginError"></div>
+    <input type="email" id="loginEmail" placeholder="email">
+    <input type="password" id="loginPass" placeholder="password">
+    <button onclick="doLogin()">LOGIN</button>
+    <div class="nk-auth-toggle" onclick="showRegister()">No account? Register</div>
+  </div>
+
+  <div class="nk-auth-box" id="registerBox" style="display:none;">
+    <h2>REGISTER</h2>
+    <div class="nk-auth-error" id="registerError"></div>
+    <input type="text" id="regUsername" placeholder="username">
+    <input type="email" id="regEmail" placeholder="email">
+    <input type="password" id="regPass" placeholder="password (min 6)">
+    <button onclick="doRegister()">REGISTER</button>
+    <div class="nk-auth-toggle" onclick="showLogin()">Have an account? Login</div>
+  </div>
+</div>
+
+<!-- Main App (hidden until auth) -->
+<div class="nk-root" id="nkRoot" style="display:none;">
+
+  <canvas class="nk-cat-layer" id="catCvs"></canvas>
+
+  <div class="nk-header">
+    <span class="nk-logo">✦ NEKO NEWS ✦</span>
+    <div class="nk-user-info">
+      <span id="headerUser"></span>
+      <button class="nk-logout-btn" onclick="doLogout()">LOGOUT</button>
+    </div>
+  </div>
+
+  <div class="nk-tabs">
+    <button class="nk-tab on" onclick="switchTab('feed',this)">▶ FEED</button>
+    <button class="nk-tab" onclick="switchTab('quiz',this)">✦ QUIZ</button>
+    <button class="nk-tab" onclick="switchTab('src',this)">⊕ SOURCES</button>
+  </div>
+
+  <div id="feed" style="display:block;">
+    <div class="nk-grid" id="grid"></div>
+  </div>
+
+  <div id="quiz" class="nk-quiz-wrap"></div>
+
+  <div id="src" style="display:none;padding:16px;">
+    <div class="nk-src-section">SELECT YOUR SOURCES</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;" id="srcChips"></div>
+
+    <div class="nk-src-section">DIGEST CADENCE</div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;" id="cadenceBtns">
+      <button class="nk-cadence-btn" data-val="daily" onclick="setCadence('daily')">DAILY</button>
+      <button class="nk-cadence-btn" data-val="weekly" onclick="setCadence('weekly')">WEEKLY</button>
+    </div>
+
+    <div class="nk-ingest-area">
+      <div class="nk-src-section">PASTE NEWSLETTER CONTENT</div>
+      <textarea id="ingestText" placeholder="Paste newsletter text or HTML here..."></textarea>
+      <div>
+        <button class="nk-ingest-btn" onclick="doIngest()" id="ingestBtn">INGEST</button>
+        <button class="nk-ingest-btn" onclick="doGenerate()" id="generateBtn">GENERATE DIGEST</button>
+      </div>
+      <div class="nk-status-msg" id="ingestStatus"></div>
+    </div>
+  </div>
+
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>
