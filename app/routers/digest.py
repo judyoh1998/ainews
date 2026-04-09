@@ -1,6 +1,6 @@
 import json
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
 from app.auth import get_current_user
 from app.database import get_db
@@ -75,18 +75,10 @@ def get_digest_by_period(
     )
 
 
-def _run_generation(user_id: int, period_key: str | None, cadence: str, force: bool):
-    """Background task for digest generation."""
-    from app.database import get_connection
 
-    db = get_connection()
-    generate_digest(db, user_id, period_key, cadence, force)
-
-
-@router.post("/digest/generate", response_model=GenerateResponse, status_code=202)
+@router.post("/digest/generate", response_model=GenerateResponse)
 def trigger_generation(
     req: GenerateRequest,
-    background_tasks: BackgroundTasks,
     user=Depends(get_current_user),
     db=Depends(get_db),
 ):
@@ -97,23 +89,19 @@ def trigger_generation(
     cadence = row["value"] if row else "daily"
     period_key = req.period_key or get_period_key(cadence)
 
-    # Create a placeholder digest
+    # Check for existing digest
     existing = db.execute(
-        "SELECT id FROM digests WHERE user_id = ? AND cadence = ? AND period_key = ?",
+        "SELECT id, status FROM digests WHERE user_id = ? AND cadence = ? AND period_key = ?",
         (user["id"], cadence, period_key),
     ).fetchone()
 
-    if existing:
-        digest_id = existing["id"]
-        if not req.force:
-            return GenerateResponse(status="already_exists", digest_id=digest_id)
-    else:
-        cur = db.execute(
-            "INSERT INTO digests (user_id, cadence, period_key, status) VALUES (?, ?, ?, 'pending')",
-            (user["id"], cadence, period_key),
-        )
-        db.commit()
-        digest_id = cur.lastrowid
+    if existing and not req.force:
+        return GenerateResponse(status="already_exists", digest_id=existing["id"])
 
-    background_tasks.add_task(_run_generation, user["id"], period_key, cadence, req.force)
-    return GenerateResponse(status="generating", digest_id=digest_id)
+    # Run generation synchronously — fast without LLM, acceptable with LLM
+    digest_id = generate_digest(db, user["id"], period_key, cadence, req.force)
+
+    # Get final status
+    row = db.execute("SELECT status FROM digests WHERE id = ?", (digest_id,)).fetchone()
+    status = row["status"] if row else "complete"
+    return GenerateResponse(status=status, digest_id=digest_id)

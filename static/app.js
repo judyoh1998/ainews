@@ -384,30 +384,26 @@ async function doFetchRss() {
     if (result.total_new > 0) {
       // Auto-generate digest from new articles
       statusEl.textContent = msg + ' Generating digest...';
-      await api('/digest/generate', {
-        method: 'POST',
-        body: JSON.stringify({ force: true }),
-      });
-      // Wait for background generation, then refresh feed
-      statusEl.textContent = msg + ' Building digest...';
-      setTimeout(async () => {
-        try {
-          const [digestData, quizData] = await Promise.all([
-            api('/digest'),
-            api('/quiz'),
-          ]);
-          stories = digestData.stories || [];
-          digestStatus = digestData.status;
-          quiz = quizData.questions || [];
-          buildGrid();
-          buildQuiz();
-          statusEl.textContent = msg + ` Digest updated with ${stories.length} stories!`;
-        } catch (e) {
-          statusEl.textContent = msg + ' Digest refresh failed: ' + e.message;
-          statusEl.className = 'nk-status-msg err';
-        }
-        btn.disabled = false;
-      }, 3000);
+      try {
+        await api('/digest/generate', {
+          method: 'POST',
+          body: JSON.stringify({ force: true }),
+        });
+        const [digestData, quizData] = await Promise.all([
+          api('/digest'),
+          api('/quiz'),
+        ]);
+        stories = digestData.stories || [];
+        digestStatus = digestData.status;
+        quiz = quizData.questions || [];
+        buildGrid();
+        buildQuiz();
+        statusEl.textContent = msg + ` Digest updated with ${stories.length} stories!`;
+      } catch (e) {
+        statusEl.textContent = msg + ' Digest generation failed: ' + e.message;
+        statusEl.className = 'nk-status-msg err';
+      }
+      btn.disabled = false;
     } else {
       statusEl.textContent = msg;
       statusEl.className = 'nk-status-msg ok';
@@ -472,40 +468,29 @@ async function doGenerate() {
   const statusEl = document.getElementById('ingestStatus');
   const btn = document.getElementById('generateBtn');
   btn.disabled = true;
-  statusEl.className = 'nk-status-msg';
-  statusEl.textContent = 'Generating digest...';
   statusEl.className = 'nk-status-msg ok';
+  statusEl.textContent = 'Generating digest...';
 
   try {
     await api('/digest/generate', {
       method: 'POST',
       body: JSON.stringify({ force: true }),
     });
-    statusEl.textContent = 'Digest generation started! Refreshing in 3s...';
-    statusEl.className = 'nk-status-msg ok';
-    // Wait for background task, then reload
-    setTimeout(async () => {
-      try {
-        const [digestData, quizData] = await Promise.all([
-          api('/digest'),
-          api('/quiz'),
-        ]);
-        stories = digestData.stories || [];
-        digestStatus = digestData.status;
-        quiz = quizData.questions || [];
-        buildGrid();
-        buildQuiz();
-        switchTab('feed', document.querySelector('.nk-tab'));
-        statusEl.textContent = 'Digest ready!';
-      } catch (e) {
-        statusEl.textContent = 'Error refreshing: ' + e.message;
-        statusEl.className = 'nk-status-msg err';
-      }
-      btn.disabled = false;
-    }, 3000);
+    const [digestData, quizData] = await Promise.all([
+      api('/digest'),
+      api('/quiz'),
+    ]);
+    stories = digestData.stories || [];
+    digestStatus = digestData.status;
+    quiz = quizData.questions || [];
+    buildGrid();
+    buildQuiz();
+    switchTab('feed', document.querySelector('.nk-tab'));
+    statusEl.textContent = `Digest ready! ${stories.length} stories.`;
   } catch (e) {
     statusEl.textContent = 'Error: ' + e.message;
     statusEl.className = 'nk-status-msg err';
+  } finally {
     btn.disabled = false;
   }
 }
