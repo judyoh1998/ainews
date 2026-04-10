@@ -396,7 +396,7 @@ async function doFetchRss() {
       msg += ` (${result.errors.length} errors)`;
     }
 
-    if (result.total_new > 0 || result.total_skipped > 0) {
+    if (result.total_new > 0) {
       // Auto-generate digest from new articles
       statusEl.textContent = msg + ' Generating digest...';
       try {
@@ -411,7 +411,7 @@ async function doFetchRss() {
       }
       btn.disabled = false;
     } else {
-      statusEl.textContent = msg;
+      statusEl.textContent = msg + ' No new articles — digest unchanged.';
       statusEl.className = 'nk-status-msg ok';
       btn.disabled = false;
     }
