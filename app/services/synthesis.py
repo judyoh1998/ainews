@@ -195,7 +195,25 @@ def _llm_pipeline(
     errors: list[str],
 ) -> tuple[list[dict], list[dict]]:
     """Run LLM synthesis + quiz generation. Returns (stories, quiz)."""
-    articles_json = json.dumps(articles[:15], indent=1)
+    # Cap each article body to ~1200 chars (enough for easy/med/pro context),
+    # cap total articles at 10, cap total prompt at ~7000 chars.
+    MAX_BODY = 1200
+    MAX_ARTICLES = 10
+    MAX_TOTAL_CHARS = 7000
+
+    trimmed = []
+    total = 0
+    for a in articles[:MAX_ARTICLES]:
+        body = (a.get("body") or "")[:MAX_BODY]
+        title = (a.get("title") or "")[:200]
+        entry = {"title": title, "body": body, "url": a.get("url")}
+        entry_size = len(title) + len(body) + 40
+        if total + entry_size > MAX_TOTAL_CHARS:
+            break  # Drop remaining (oldest/lowest priority) articles
+        trimmed.append(entry)
+        total += entry_size
+
+    articles_json = json.dumps(trimmed, indent=1)
 
     period_desc = f"the {'week of ' if cadence == 'weekly' else ''}{period_key}"
 

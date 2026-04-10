@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     default_cadence: str = "daily"
     default_timezone: str = "UTC"
     max_newsletter_size: int = 500_000
-    llm_model: str = "claude-sonnet-4-20250514"
+    llm_model: str = "claude-haiku-4-5-20251001"
     llm_max_retries: int = 3
     llm_timeout: int = 120
 

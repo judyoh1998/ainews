@@ -16,7 +16,7 @@ RUN pip install --no-cache-dir \
 # Copy application code
 COPY app/ app/
 COPY static/ static/
-COPY run.py seed.py ./
+COPY run.py seed.py check_feeds.py ./
 
 # Create data directory (will be overridden by Railway volume mount)
 RUN mkdir -p /data
