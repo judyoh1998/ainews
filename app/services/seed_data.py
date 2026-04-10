@@ -168,7 +168,7 @@ RSS_CATALOG = [
         "category": "news",
     },
     {
-        "name": "Ars Technica - AI",
+        "name": "Ars Technica",
         "url": "https://feeds.arstechnica.com/arstechnica/features",
         "source_type": "rss",
         "category": "news",
@@ -176,7 +176,7 @@ RSS_CATALOG = [
     # AI Labs
     {
         "name": "OpenAI Blog",
-        "url": "https://openai.com/blog/rss.xml",
+        "url": "https://openai.com/index/rss.xml",
         "source_type": "rss",
         "category": "labs",
     },
@@ -188,7 +188,7 @@ RSS_CATALOG = [
     },
     {
         "name": "Google AI Blog",
-        "url": "https://blog.google/technology/ai/rss/",
+        "url": "https://blog.google/technology/ai/rss",
         "source_type": "rss",
         "category": "labs",
     },
@@ -200,12 +200,12 @@ RSS_CATALOG = [
     },
     {
         "name": "DeepMind Blog",
-        "url": "https://deepmind.google/blog/rss.xml",
+        "url": "https://deepmind.google/blog/rss/",
         "source_type": "rss",
         "category": "labs",
     },
     {
-        "name": "Meta AI Blog",
+        "name": "Meta Engineering",
         "url": "https://engineering.fb.com/feed/",
         "source_type": "rss",
         "category": "labs",
@@ -229,42 +229,5 @@ RSS_CATALOG = [
         "url": "https://rss.arxiv.org/rss/cs.AI",
         "source_type": "rss",
         "category": "research",
-    },
-    # Twitter/X via Nitter (may be unreliable — depends on instance availability)
-    {
-        "name": "@karpathy",
-        "url": "https://nitter.poast.org/karpathy/rss",
-        "source_type": "rss",
-        "category": "twitter",
-    },
-    {
-        "name": "@sama",
-        "url": "https://nitter.poast.org/sama/rss",
-        "source_type": "rss",
-        "category": "twitter",
-    },
-    {
-        "name": "@OpenAI",
-        "url": "https://nitter.poast.org/OpenAI/rss",
-        "source_type": "rss",
-        "category": "twitter",
-    },
-    {
-        "name": "@AnthropicAI",
-        "url": "https://nitter.poast.org/AnthropicAI/rss",
-        "source_type": "rss",
-        "category": "twitter",
-    },
-    {
-        "name": "@GoogleAI",
-        "url": "https://nitter.poast.org/GoogleAI/rss",
-        "source_type": "rss",
-        "category": "twitter",
-    },
-    {
-        "name": "@huggingface",
-        "url": "https://nitter.poast.org/huggingface/rss",
-        "source_type": "rss",
-        "category": "twitter",
     },
 ]

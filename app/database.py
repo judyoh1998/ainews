@@ -109,14 +109,17 @@ def init_db():
     # Fix broken catalog URLs for existing users
     _url_fixes = [
         ("https://ai.meta.com/blog/rss/", "https://engineering.fb.com/feed/"),
+        ("https://openai.com/blog/rss.xml", "https://openai.com/index/rss.xml"),
+        ("https://deepmind.google/blog/rss.xml", "https://deepmind.google/blog/rss/"),
+        ("https://blog.google/technology/ai/rss/", "https://blog.google/technology/ai/rss"),
     ]
     for old_url, new_url in _url_fixes:
         conn.execute(
             "UPDATE sources SET url = ? WHERE url = ?", (new_url, old_url)
         )
-    # Remove broken @ylecun nitter source
+    # Remove all Nitter/Twitter sources (unreliable, systematically blocked)
     conn.execute(
-        "DELETE FROM sources WHERE url = 'https://nitter.poast.org/ylecun/rss'"
+        "DELETE FROM sources WHERE url LIKE '%nitter.poast.org%'"
     )
     conn.commit()
 
