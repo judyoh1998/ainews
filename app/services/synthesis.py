@@ -302,7 +302,7 @@ def _articles_to_stories(
             "pro": full,
             "sources": [article.get("url", "")] if article.get("url") else [],
         })
-        if len(stories) >= 8:
+        if len(stories) >= 9:
             break
 
     # Generate simple quiz from the stories
