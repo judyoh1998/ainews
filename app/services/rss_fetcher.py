@@ -138,7 +138,7 @@ def fetch_rss_source(
         with urlopen(req, timeout=FETCH_TIMEOUT) as resp:
             xml_bytes = resp.read()
 
-        entries = _parse_feed(xml_bytes)
+        entries = _parse_feed(xml_bytes)[:5]  # Cap at 5 most recent per feed
         if not entries:
             result["error"] = "No entries found in feed"
             return result

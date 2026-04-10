@@ -118,8 +118,8 @@ def generate_digest(
 
         db.commit()
 
-        # Pick the 20 most recent articles
-        all_articles = all_articles[:20]
+        # Pick the 15 most recent articles
+        all_articles = all_articles[:15]
 
         # Try LLM synthesis
         llm = get_llm_service()
@@ -195,12 +195,7 @@ def _llm_pipeline(
     errors: list[str],
 ) -> tuple[list[dict], list[dict]]:
     """Run LLM synthesis + quiz generation. Returns (stories, quiz)."""
-    articles_json = json.dumps(articles[:50], indent=1)  # Cap at 50 articles
-
-    # Estimate tokens — truncate if too large
-    est_tokens = len(articles_json) // 4
-    if est_tokens > 120_000:
-        articles_json = json.dumps(articles[:20], indent=1)
+    articles_json = json.dumps(articles[:15], indent=1)
 
     period_desc = f"the {'week of ' if cadence == 'weekly' else ''}{period_key}"
 
@@ -307,7 +302,7 @@ def _articles_to_stories(
             "pro": full,
             "sources": [article.get("url", "")] if article.get("url") else [],
         })
-        if len(stories) >= 9:
+        if len(stories) >= 8:
             break
 
     # Generate simple quiz from the stories

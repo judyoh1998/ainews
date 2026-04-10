@@ -8,7 +8,7 @@ USER_TEMPLATE = """Here are articles extracted from {source_count} AI newsletter
 
 {articles_json}
 
-Synthesize these into the TOP 9 most important/interesting AI stories. Rules:
+Synthesize these into the TOP 5-8 most important/interesting AI stories. Rules:
 1. DEDUPLICATE: If the same story appears in multiple sources, merge into one entry and list all sources.
 2. RANK by importance/impact (1 = most important).
 3. Write THREE versions of each story:
@@ -16,7 +16,7 @@ Synthesize these into the TOP 9 most important/interesting AI stories. Rules:
    - "medium": 1 paragraph with technical context, for developers who use LLMs
    - "pro": 1-2 paragraphs with deep technical analysis, for ML practitioners
 4. Assign a short tag/category to each: one of [MODELS, POLICY, AGENTS, HARDWARE, SAFETY, RESEARCH, PRODUCTS, OPEN SRC, TRENDS, BUSINESS, VISION, ROBOTICS]
-5. If fewer than 9 distinct stories exist, return as many as you can (minimum 3).
+5. Return between 5 and 8 stories. Fewer if there aren't enough distinct topics.
 
 Respond with ONLY a JSON object (no markdown fences):
 {{
