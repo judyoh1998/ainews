@@ -99,10 +99,11 @@ async function enterApp() {
 
   // Load data in parallel
   try {
-    const [digestData, quizData, cadenceData] = await Promise.all([
+    const [digestData, quizData, cadenceData, sourcesData] = await Promise.all([
       api('/digest'),
       api('/quiz'),
       api('/preferences/cadence'),
+      api('/sources'),
     ]);
 
     stories = digestData.stories || [];
@@ -110,12 +111,20 @@ async function enterApp() {
     quiz = quizData.questions || [];
     cadence = cadenceData.value || 'daily';
 
-    buildGrid();
-    buildQuiz();
+    const hasRealSources = sourcesData.some(s => s.source_type === 'rss');
+    const needsOnboarding = digestStatus === 'seed' && !hasRealSources;
+
+    initCats();
+    updateCadenceUI();
+
+    if (needsOnboarding) {
+      showOnboarding();
+    } else {
+      buildGrid();
+      buildQuiz();
+    }
     loadSources();
     loadCatalog();
-    updateCadenceUI();
-    initCats();
   } catch (e) {
     console.error('Failed to load app data:', e);
   }
@@ -136,17 +145,8 @@ function buildGrid() {
   const grid = document.getElementById('grid');
   grid.innerHTML = '';
 
-  if (!stories.length) {
-    grid.innerHTML = `
-      <div class="nk-empty" style="grid-column:1/-1;">
-        <div class="nk-empty-icon">🐱</div>
-        <div class="nk-empty-text">
-          No stories yet!<br>
-          Go to SOURCES tab, paste a newsletter,<br>
-          and hit GENERATE DIGEST.
-        </div>
-      </div>`;
-    return;
+  if (!stories.length || digestStatus === 'seed') {
+    return;  // Onboarding or empty — handled by showOnboarding()
   }
 
   stories.forEach((s, i) => {
@@ -183,6 +183,171 @@ function onSlide(i, val) {
   document.getElementById('badge' + i).style.cssText = BADGE_STYLES[v];
   document.getElementById('txt' + i).style.color = TEXT_COLORS[v];
   spawnSparkles(document.getElementById('badge' + i));
+}
+
+// ── Onboarding ──
+let onboardingPicks = 0;
+
+async function showOnboarding() {
+  const grid = document.getElementById('grid');
+  try {
+    const catalog = await api('/sources/catalog');
+    const categoryLabels = {
+      news: 'NEWS OUTLETS',
+      labs: 'AI LABS',
+      community: 'COMMUNITY',
+      research: 'RESEARCH',
+      twitter: 'TWITTER/X (VIA NITTER)',
+    };
+    const groups = {};
+    catalog.forEach(entry => {
+      const cat = entry.category || 'other';
+      if (!groups[cat]) groups[cat] = [];
+      groups[cat].push(entry);
+    });
+
+    let html = `<div id="onboarding" style="grid-column:1/-1;padding:8px 0;">
+      <div style="text-align:center;margin-bottom:16px;">
+        <div style="font-size:28px;margin-bottom:8px;">🐱</div>
+        <div style="font-size:10px;color:#831843;margin-bottom:6px;">GET STARTED</div>
+        <div style="font-size:7px;color:#be185d;line-height:2;">Pick some AI news sources to follow:</div>
+      </div>`;
+
+    for (const [cat, entries] of Object.entries(groups)) {
+      html += `<div style="margin-bottom:10px;">
+        <div class="nk-catalog-group-title">${categoryLabels[cat] || cat.toUpperCase()}</div>
+        <div class="nk-catalog-group">`;
+      entries.forEach((entry, i) => {
+        const id = `ob-${cat}-${i}`;
+        html += `<div class="nk-catalog-item ${entry.subscribed ? 'subscribed' : 'available'}"
+          id="${id}"
+          onclick="onboardingToggle('${id}', ${JSON.stringify(entry).replace(/'/g, "\\'")})"
+          >${(entry.subscribed ? '\u2713 ' : '+ ') + entry.name}</div>`;
+      });
+      html += `</div></div>`;
+    }
+
+    html += `<div style="text-align:center;margin-top:16px;">
+      <button class="nk-ingest-btn" id="onboardingStartBtn" onclick="onboardingStart()"
+        style="padding:10px 20px;font-size:8px;" disabled>
+        SELECT AT LEAST ONE SOURCE
+      </button>
+      <div id="onboardingStatus" class="nk-status-msg" style="margin-top:8px;"></div>
+    </div></div>`;
+
+    grid.innerHTML = html;
+    onboardingPicks = catalog.filter(e => e.subscribed).length;
+    _updateOnboardingBtn();
+  } catch (e) {
+    console.error('Failed to show onboarding:', e);
+  }
+}
+
+async function onboardingToggle(chipId, entry) {
+  const chip = document.getElementById(chipId);
+  try {
+    if (chip.classList.contains('subscribed')) {
+      const sources = await api('/sources');
+      const match = sources.find(s => s.url === entry.url);
+      if (match) await api(`/sources/${match.id}`, { method: 'DELETE' });
+      chip.className = 'nk-catalog-item available';
+      chip.textContent = '+ ' + entry.name;
+      onboardingPicks--;
+    } else {
+      await api('/sources', {
+        method: 'POST',
+        body: JSON.stringify({ name: entry.name, url: entry.url, source_type: 'rss' }),
+      });
+      chip.className = 'nk-catalog-item subscribed';
+      chip.textContent = '\u2713 ' + entry.name;
+      onboardingPicks++;
+    }
+  } catch (e) {
+    if (e.message.includes('Already subscribed')) {
+      chip.className = 'nk-catalog-item subscribed';
+      chip.textContent = '\u2713 ' + entry.name;
+    }
+  }
+  _updateOnboardingBtn();
+}
+
+function _updateOnboardingBtn() {
+  const btn = document.getElementById('onboardingStartBtn');
+  if (!btn) return;
+  if (onboardingPicks > 0) {
+    btn.disabled = false;
+    btn.textContent = `BUILD MY DIGEST (${onboardingPicks} source${onboardingPicks > 1 ? 's' : ''})`;
+  } else {
+    btn.disabled = true;
+    btn.textContent = 'SELECT AT LEAST ONE SOURCE';
+  }
+}
+
+async function onboardingStart() {
+  const btn = document.getElementById('onboardingStartBtn');
+  const statusEl = document.getElementById('onboardingStatus');
+  btn.disabled = true;
+  btn.textContent = 'FETCHING FEEDS...';
+  statusEl.className = 'nk-status-msg ok';
+  statusEl.textContent = '';
+  statusEl.style.display = 'block';
+
+  try {
+    // Fetch RSS
+    statusEl.textContent = 'Fetching articles from your sources...';
+    const result = await api('/sources/fetch', { method: 'POST' });
+    const newCount = result.total_new;
+
+    if (newCount === 0) {
+      statusEl.textContent = 'No articles found. Try different sources.';
+      statusEl.className = 'nk-status-msg err';
+      btn.disabled = false;
+      _updateOnboardingBtn();
+      return;
+    }
+
+    // Generate digest
+    statusEl.textContent = `Got ${newCount} articles! Generating your digest...`;
+    const gen = await api('/digest/generate', {
+      method: 'POST',
+      body: JSON.stringify({ force: true }),
+    });
+
+    // Poll for completion
+    const maxAttempts = 30;
+    for (let i = 0; i < maxAttempts; i++) {
+      await new Promise(r => setTimeout(r, 2000));
+      const status = await api(`/digest/status/${gen.digest_id}`);
+      if (status.status === 'complete' || status.status === 'partial') {
+        // Done — load the digest and dismiss onboarding
+        const [digestData, quizData] = await Promise.all([
+          api('/digest'),
+          api('/quiz'),
+        ]);
+        stories = digestData.stories || [];
+        digestStatus = digestData.status;
+        quiz = quizData.questions || [];
+        buildGrid();
+        buildQuiz();
+        loadSources();
+        loadCatalog();
+        return;
+      } else if (status.status === 'failed') {
+        statusEl.textContent = 'Digest generation failed. Try again.';
+        statusEl.className = 'nk-status-msg err';
+        btn.disabled = false;
+        _updateOnboardingBtn();
+        return;
+      }
+      statusEl.textContent = `Generating your digest` + '.'.repeat((i % 3) + 1);
+    }
+    statusEl.textContent = 'Still generating — refresh the page in a moment.';
+  } catch (e) {
+    statusEl.textContent = 'Error: ' + e.message;
+    statusEl.className = 'nk-status-msg err';
+    btn.disabled = false;
+    _updateOnboardingBtn();
+  }
 }
 
 // ── Build Quiz ──
