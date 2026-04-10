@@ -406,9 +406,23 @@ async function loadSources() {
     srcs.forEach(s => {
       const c = document.createElement('div');
       c.className = 'nk-chip ' + (s.active ? 'active' : 'inactive');
+      c.style.cssText = 'display:inline-flex;align-items:center;gap:6px;';
       const typeIcon = s.source_type === 'rss' ? '\u{1F4E1} ' : '';
-      c.textContent = typeIcon + s.name;
-      c.onclick = () => toggleSource(s.id, !s.active, c);
+      const label = document.createElement('span');
+      label.textContent = typeIcon + s.name;
+      label.style.cursor = 'pointer';
+      label.onclick = () => toggleSource(s.id, !s.active, c);
+      c.appendChild(label);
+      const del = document.createElement('span');
+      del.textContent = '\u2715';
+      del.style.cssText = 'cursor:pointer;opacity:0.6;font-size:8px;';
+      del.onclick = async (e) => {
+        e.stopPropagation();
+        await api(`/sources/${s.id}`, { method: 'DELETE' });
+        loadSources();
+        loadCatalog();
+      };
+      c.appendChild(del);
       chips.appendChild(c);
     });
   } catch (e) {
