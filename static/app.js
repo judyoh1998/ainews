@@ -658,9 +658,10 @@ async function doGenerate() {
 
 // ── Poll for digest completion then refresh feed ──
 async function pollAndRefreshDigest(digestId, statusEl, msgPrefix) {
-  const maxAttempts = 30;  // 30 x 2s = 60s max
+  const maxAttempts = 90;  // 90 x 2s = 3 min max
   for (let i = 0; i < maxAttempts; i++) {
     await new Promise(r => setTimeout(r, 2000));
+    const elapsed = (i + 1) * 2;
     try {
       const status = await api(`/digest/status/${digestId}`);
       if (status.status === 'complete' || status.status === 'partial') {
@@ -674,21 +675,24 @@ async function pollAndRefreshDigest(digestId, statusEl, msgPrefix) {
         quiz = quizData.questions || [];
         buildGrid();
         buildQuiz();
-        statusEl.textContent = msgPrefix + ` Digest updated with ${stories.length} stories!`;
+        statusEl.textContent = msgPrefix + ` Digest ready! ${stories.length} stories.`;
         statusEl.className = 'nk-status-msg ok';
+        switchTab('feed', document.querySelector('.nk-tab'));
         return;
       } else if (status.status === 'failed') {
         statusEl.textContent = msgPrefix + ' Digest generation failed.';
         statusEl.className = 'nk-status-msg err';
         return;
       }
-      // Still generating — update dots
-      statusEl.textContent = msgPrefix + ' Generating digest' + '.'.repeat((i % 3) + 1);
+      // Still generating — show elapsed time
+      statusEl.textContent = msgPrefix + ` Generating digest... (${elapsed}s)`;
     } catch (e) {
       // Poll error, keep trying
     }
   }
-  statusEl.textContent = msgPrefix + ' Digest is still generating. Refresh the page in a moment.';
+  // Final fallback — auto-refresh the page
+  statusEl.textContent = msgPrefix + ' Almost done — refreshing page...';
+  setTimeout(() => location.reload(), 3000);
 }
 
 // ── Tab Switching ──
