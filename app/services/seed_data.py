@@ -206,7 +206,7 @@ RSS_CATALOG = [
     },
     {
         "name": "Meta AI Blog",
-        "url": "https://ai.meta.com/blog/rss/",
+        "url": "https://engineering.fb.com/feed/",
         "source_type": "rss",
         "category": "labs",
     },
@@ -240,12 +240,6 @@ RSS_CATALOG = [
     {
         "name": "@sama",
         "url": "https://nitter.poast.org/sama/rss",
-        "source_type": "rss",
-        "category": "twitter",
-    },
-    {
-        "name": "@ylecun",
-        "url": "https://nitter.poast.org/ylecun/rss",
         "source_type": "rss",
         "category": "twitter",
     },

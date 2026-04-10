@@ -106,6 +106,18 @@ def init_db():
         "CREATE UNIQUE INDEX IF NOT EXISTS idx_newsletters_user_entry_url "
         "ON ingested_newsletters(user_id, entry_url) WHERE entry_url IS NOT NULL"
     )
+    # Fix broken catalog URLs for existing users
+    _url_fixes = [
+        ("https://ai.meta.com/blog/rss/", "https://engineering.fb.com/feed/"),
+    ]
+    for old_url, new_url in _url_fixes:
+        conn.execute(
+            "UPDATE sources SET url = ? WHERE url = ?", (new_url, old_url)
+        )
+    # Remove broken @ylecun nitter source
+    conn.execute(
+        "DELETE FROM sources WHERE url = 'https://nitter.poast.org/ylecun/rss'"
+    )
     conn.commit()
 
 
