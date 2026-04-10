@@ -28,20 +28,20 @@ body {
   border-radius: 12px;
   padding: 24px;
   box-shadow: 3px 3px 0 #f9a8d4;
-  max-width: 360px;
+  max-width: 400px;
   width: 100%;
 }
 .nk-auth-box h2 {
-  font-size: 11px;
+  font-size: 14px;
   color: #831843;
   margin-bottom: 16px;
   text-align: center;
 }
 .nk-auth-box input {
   font-family: 'Press Start 2P', monospace;
-  font-size: 8px;
+  font-size: 11px;
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   margin-bottom: 10px;
   border: 1.5px solid #f9a8d4;
   border-radius: 8px;
@@ -55,9 +55,9 @@ body {
 }
 .nk-auth-box button {
   font-family: 'Press Start 2P', monospace;
-  font-size: 8px;
+  font-size: 11px;
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   border: none;
   border-radius: 8px;
   background: linear-gradient(90deg, #ec4899, #f472b6);
@@ -68,7 +68,7 @@ body {
 }
 .nk-auth-box button:hover { opacity: 0.9; }
 .nk-auth-toggle {
-  font-size: 7px;
+  font-size: 10px;
   color: #be185d;
   text-align: center;
   margin-top: 10px;
@@ -76,10 +76,10 @@ body {
   text-decoration: underline;
 }
 .nk-auth-error {
-  font-size: 7px;
+  font-size: 10px;
   color: #991b1b;
   background: #fee2e2;
-  padding: 6px 8px;
+  padding: 8px 10px;
   border-radius: 6px;
   margin-bottom: 8px;
   display: none;
@@ -88,7 +88,7 @@ body {
 /* ── Header ── */
 .nk-header {
   background: linear-gradient(90deg, #ec4899 0%, #f472b6 50%, #fb7185 100%);
-  padding: 14px 20px;
+  padding: 16px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -97,7 +97,7 @@ body {
   z-index: 5;
 }
 .nk-logo {
-  font-size: 13px;
+  font-size: 16px;
   color: #fff;
   text-shadow: 2px 2px 0 #9d174d;
   letter-spacing: 2px;
@@ -108,13 +108,13 @@ body {
   gap: 10px;
 }
 .nk-user-info span {
-  font-size: 7px;
+  font-size: 10px;
   color: #fce7f3;
 }
 .nk-logout-btn {
   font-family: 'Press Start 2P', monospace;
-  font-size: 7px;
-  padding: 5px 8px;
+  font-size: 9px;
+  padding: 6px 10px;
   border: 1px solid #fce7f3;
   border-radius: 6px;
   background: transparent;
@@ -133,8 +133,8 @@ body {
 }
 .nk-tab {
   font-family: 'Press Start 2P', monospace;
-  font-size: 9px;
-  padding: 10px 16px;
+  font-size: 12px;
+  padding: 12px 20px;
   border: none;
   background: transparent;
   color: #be185d;
@@ -152,8 +152,8 @@ body {
 .nk-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  padding: 16px;
+  gap: 14px;
+  padding: 18px;
   position: relative;
   z-index: 3;
 }
@@ -169,7 +169,7 @@ body {
   box-shadow: 3px 3px 0 #f9a8d4, 0 0 20px rgba(236,72,153,0.08);
   transition: transform 0.2s, box-shadow 0.2s;
   animation: cardIn 0.4s ease both;
-  min-height: 180px;
+  min-height: 200px;
 }
 .nk-card:hover {
   transform: translateY(-3px) scale(1.01);
@@ -196,14 +196,14 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 10px 7px;
+  padding: 10px 8px;
   background: linear-gradient(180deg, #fce7f3 0%, #fdf2f8 100%);
   border-right: 2px solid #f9a8d4;
   gap: 7px;
-  min-width: 44px;
+  min-width: 48px;
 }
 .nk-slider-label {
-  font-size: 7px;
+  font-size: 9px;
   color: #be185d;
   writing-mode: vertical-rl;
   text-orientation: mixed;
@@ -214,33 +214,33 @@ body {
   -webkit-appearance: slider-vertical;
   writing-mode: vertical-lr;
   direction: rtl;
-  width: 22px;
-  height: 86px;
+  width: 24px;
+  height: 90px;
   cursor: pointer;
   accent-color: #ec4899;
   background: transparent;
 }
 .nk-diff-badge {
-  font-size: 6px;
-  padding: 4px 5px;
+  font-size: 8px;
+  padding: 4px 6px;
   border-radius: 4px;
   text-align: center;
-  min-width: 30px;
+  min-width: 34px;
   transition: background 0.3s, color 0.3s;
 }
 
 /* ── Card Body ── */
 .nk-body {
   flex: 1;
-  padding: 12px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 8px;
 }
 .nk-tag {
-  font-size: 7px;
+  font-size: 9px;
   display: inline-block;
-  padding: 4px 8px;
+  padding: 4px 10px;
   border-radius: 20px;
   background: linear-gradient(90deg, #ec4899, #f472b6);
   color: #fff;
@@ -253,12 +253,12 @@ body {
   50%     { box-shadow: 0 0 0 4px rgba(236,72,153,0); }
 }
 .nk-headline {
-  font-size: 8px;
+  font-size: 11px;
   color: #831843;
   line-height: 1.8;
 }
 .nk-text {
-  font-size: 7.5px;
+  font-size: 10px;
   color: #9d174d;
   line-height: 2;
   flex: 1;
@@ -285,29 +285,29 @@ body {
   background: rgba(255,255,255,0.85);
   border: 2px solid #f9a8d4;
   border-radius: 12px;
-  padding: 14px;
+  padding: 16px;
   box-shadow: 3px 3px 0 #f9a8d4;
   animation: cardIn 0.3s ease both;
 }
 .nk-quiz-q {
-  font-size: 8px;
+  font-size: 11px;
   color: #831843;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   line-height: 1.9;
 }
 .nk-opt {
   display: block;
   width: 100%;
   text-align: left;
-  padding: 8px 12px;
+  padding: 10px 14px;
   font-family: 'Press Start 2P', monospace;
-  font-size: 7px;
+  font-size: 10px;
   color: #be185d;
   background: #fdf2f8;
   border: 1.5px solid #f9a8d4;
   border-radius: 8px;
   cursor: pointer;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   transition: all 0.15s;
 }
 .nk-opt:hover { background: linear-gradient(90deg,#ec4899,#f472b6); color: #fff; }
@@ -317,8 +317,8 @@ body {
 .nk-score {
   background: linear-gradient(90deg, #ec4899, #f472b6);
   border-radius: 12px;
-  padding: 12px;
-  font-size: 9px;
+  padding: 14px;
+  font-size: 12px;
   color: #fff;
   text-align: center;
   text-shadow: 1px 1px 0 #9d174d;
@@ -333,15 +333,15 @@ body {
 
 /* ── Sources tab ── */
 .nk-src-section {
-  font-size: 8px;
+  font-size: 11px;
   color: #be185d;
   margin-bottom: 10px;
   line-height: 2.2;
 }
 .nk-chip {
   font-family: 'Press Start 2P', monospace;
-  font-size: 7px;
-  padding: 6px 10px;
+  font-size: 10px;
+  padding: 8px 12px;
   border-radius: 20px;
   cursor: pointer;
   border: 1.5px solid #f9a8d4;
@@ -360,9 +360,9 @@ body {
 /* ── Cadence buttons ── */
 .nk-cadence-btn {
   font-family: 'Press Start 2P', monospace;
-  font-size: 9px;
+  font-size: 11px;
   border-radius: 8px;
-  padding: 8px 14px;
+  padding: 10px 16px;
   border: 1.5px solid #f9a8d4;
   background: transparent;
   color: #be185d;
@@ -383,10 +383,10 @@ body {
 }
 .nk-ingest-area textarea {
   font-family: 'Press Start 2P', monospace;
-  font-size: 7px;
+  font-size: 10px;
   width: 100%;
   height: 120px;
-  padding: 10px;
+  padding: 12px;
   border: 1.5px solid #f9a8d4;
   border-radius: 8px;
   background: #fdf2f8;
@@ -400,8 +400,8 @@ body {
 }
 .nk-ingest-btn {
   font-family: 'Press Start 2P', monospace;
-  font-size: 7px;
-  padding: 8px 14px;
+  font-size: 10px;
+  padding: 10px 16px;
   border: none;
   border-radius: 8px;
   background: linear-gradient(90deg, #ec4899, #f472b6);
@@ -413,8 +413,8 @@ body {
 .nk-ingest-btn:hover { opacity: 0.9; }
 .nk-ingest-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .nk-status-msg {
-  font-size: 7px;
-  padding: 6px 8px;
+  font-size: 10px;
+  padding: 8px 10px;
   border-radius: 6px;
   margin-top: 8px;
   display: none;
@@ -428,12 +428,12 @@ body {
   padding: 60px 20px;
   color: #be185d;
 }
-.nk-empty-icon { font-size: 40px; margin-bottom: 16px; }
-.nk-empty-text { font-size: 8px; line-height: 2.2; }
+.nk-empty-icon { font-size: 48px; margin-bottom: 16px; }
+.nk-empty-text { font-size: 11px; line-height: 2.2; }
 
 /* ── Seed Badge ── */
 .nk-seed-badge {
-  font-size: 6px;
+  font-size: 8px;
   padding: 3px 6px;
   border-radius: 10px;
   background: #fef3c7;
@@ -449,7 +449,7 @@ body {
   margin-bottom: 16px;
 }
 .nk-catalog-group-title {
-  font-size: 7px;
+  font-size: 9px;
   color: #9d174d;
   text-transform: uppercase;
   margin-bottom: 4px;
@@ -462,8 +462,8 @@ body {
 }
 .nk-catalog-item {
   font-family: 'Press Start 2P', monospace;
-  font-size: 6px;
-  padding: 6px 10px;
+  font-size: 9px;
+  padding: 8px 12px;
   border-radius: 20px;
   cursor: pointer;
   border: 1.5px solid #f9a8d4;
@@ -485,8 +485,8 @@ body {
 /* ── Custom RSS Input ── */
 .nk-input-field {
   font-family: 'Press Start 2P', monospace;
-  font-size: 7px;
-  padding: 8px 10px;
+  font-size: 10px;
+  padding: 10px 12px;
   border: 1.5px solid #f9a8d4;
   border-radius: 8px;
   background: #fdf2f8;
@@ -516,7 +516,7 @@ body {
 .nk-loading {
   text-align: center;
   padding: 40px;
-  font-size: 8px;
+  font-size: 11px;
   color: #be185d;
   animation: pulse 1.5s ease-in-out infinite;
 }
