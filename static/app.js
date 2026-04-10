@@ -429,27 +429,6 @@ async function toggleSource(id, active, el) {
   }
 }
 
-async function applySourceChanges() {
-  const statusEl = document.getElementById('fetchStatus');
-  const btn = document.getElementById('applySourcesBtn');
-  btn.disabled = true;
-  statusEl.className = 'nk-status-msg ok';
-  statusEl.textContent = 'Regenerating digest...';
-  statusEl.style.display = 'inline-block';
-  try {
-    const gen = await api('/digest/generate', {
-      method: 'POST',
-      body: JSON.stringify({ force: true }),
-    });
-    await pollAndRefreshDigest(gen.digest_id, statusEl, '');
-  } catch (e) {
-    statusEl.textContent = 'Failed: ' + e.message;
-    statusEl.className = 'nk-status-msg err';
-  } finally {
-    btn.disabled = false;
-  }
-}
-
 // ── RSS Catalog ──
 async function loadCatalog() {
   try {
