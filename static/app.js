@@ -259,22 +259,29 @@ async function toggleSource(id, active, el) {
       body: JSON.stringify({ active }),
     });
     el.className = 'nk-chip ' + (active ? 'active' : 'inactive');
-    // Regenerate digest with updated source selection
-    regenerateAfterSourceChange();
   } catch (e) {
     console.error('Failed to toggle source:', e);
   }
 }
 
-async function regenerateAfterSourceChange() {
+async function applySourceChanges() {
+  const statusEl = document.getElementById('fetchStatus');
+  const btn = document.getElementById('applySourcesBtn');
+  btn.disabled = true;
+  statusEl.className = 'nk-status-msg ok';
+  statusEl.textContent = 'Regenerating digest...';
+  statusEl.style.display = 'inline-block';
   try {
     const gen = await api('/digest/generate', {
       method: 'POST',
       body: JSON.stringify({ force: true }),
     });
-    await pollAndRefreshDigest(gen.digest_id, document.getElementById('fetchStatus'), 'Sources changed.');
+    await pollAndRefreshDigest(gen.digest_id, statusEl, '');
   } catch (e) {
-    console.error('Failed to regenerate after source change:', e);
+    statusEl.textContent = 'Failed: ' + e.message;
+    statusEl.className = 'nk-status-msg err';
+  } finally {
+    btn.disabled = false;
   }
 }
 
@@ -347,7 +354,6 @@ async function toggleCatalogSubscription(entry, chip) {
       chip.textContent = '\u2713 ' + entry.name;
     }
     loadSources();
-    regenerateAfterSourceChange();
   } catch (e) {
     if (e.message.includes('Already subscribed')) {
       chip.className = 'nk-catalog-item subscribed';
