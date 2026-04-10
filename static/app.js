@@ -388,22 +388,38 @@ async function addCustomRss() {
 
 // ── Fetch RSS ──
 async function doFetchRss() {
+  await _fetchRss(false);
+}
+
+async function doForceRefetch() {
+  if (!confirm('This clears all previously fetched articles and re-downloads everything. Continue?')) return;
+  await _fetchRss(true);
+}
+
+async function _fetchRss(force) {
   const btn = document.getElementById('fetchBtn');
+  const forceBtn = document.getElementById('forceFetchBtn');
   const statusEl = document.getElementById('fetchStatus');
+  const errorsEl = document.getElementById('fetchErrors');
   btn.disabled = true;
+  forceBtn.disabled = true;
+  errorsEl.style.display = 'none';
   statusEl.className = 'nk-status-msg ok';
-  statusEl.textContent = 'Fetching feeds...';
+  statusEl.textContent = force ? 'Force re-fetching all feeds...' : 'Fetching feeds...';
   statusEl.style.display = 'inline-block';
 
   try {
-    const result = await api('/sources/fetch', { method: 'POST' });
-    let msg = `Fetched ${result.sources_fetched} feeds: ${result.total_new} new, ${result.total_skipped} skipped.`;
+    const result = await api('/sources/fetch?force=' + force, { method: 'POST' });
+    let msg = `${result.total_new} new, ${result.total_skipped} skipped from ${result.sources_fetched} feeds.`;
+
+    // Show per-source errors
     if (result.errors.length > 0) {
-      msg += ` (${result.errors.length} errors)`;
+      msg += ` (${result.errors.length} failed)`;
+      errorsEl.innerHTML = result.errors.map(e => '&bull; ' + e).join('<br>');
+      errorsEl.style.display = 'block';
     }
 
     if (result.total_new > 0) {
-      // Auto-generate digest from new articles
       statusEl.textContent = msg + ' Generating digest...';
       try {
         const gen = await api('/digest/generate', {
@@ -415,16 +431,16 @@ async function doFetchRss() {
         statusEl.textContent = msg + ' Digest generation failed: ' + e.message;
         statusEl.className = 'nk-status-msg err';
       }
-      btn.disabled = false;
     } else {
       statusEl.textContent = msg + ' No new articles — digest unchanged.';
       statusEl.className = 'nk-status-msg ok';
-      btn.disabled = false;
     }
   } catch (e) {
     statusEl.textContent = 'Fetch error: ' + e.message;
     statusEl.className = 'nk-status-msg err';
+  } finally {
     btn.disabled = false;
+    forceBtn.disabled = false;
   }
 }
 

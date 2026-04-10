@@ -47,11 +47,18 @@ def get_catalog(user=Depends(get_current_user), db=Depends(get_db)):
 
 
 @router.post("/sources/fetch", response_model=FetchResponse)
-def fetch_sources(user=Depends(get_current_user), db=Depends(get_db)):
-    """Pull latest entries from all active RSS feeds for the current user."""
+def fetch_sources(
+    force: bool = False,
+    user=Depends(get_current_user),
+    db=Depends(get_db),
+):
+    """Pull latest entries from all active RSS feeds.
+
+    If force=True, clears all previously seen articles and re-fetches everything.
+    """
     from app.services.rss_fetcher import fetch_all_rss_sources
 
-    return fetch_all_rss_sources(db, user["id"])
+    return fetch_all_rss_sources(db, user["id"], force=force)
 
 
 # ── CRUD ──

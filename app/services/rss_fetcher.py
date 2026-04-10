@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 USER_AGENT = "NekoNews/0.1"
 FETCH_TIMEOUT = 15
 ENTRY_BODY_MAX = 5000
+DEDUP_TTL_DAYS = 7
 
 # Namespace map for Atom feeds
 NS = {
@@ -96,6 +97,21 @@ def _parse_feed(xml_bytes: bytes) -> list[dict]:
     return entries
 
 
+def clear_seen_articles(db: sqlite3.Connection, user_id: int) -> int:
+    """Delete all RSS-sourced ingested articles for user's active sources.
+
+    Returns the number of rows deleted.
+    """
+    cur = db.execute(
+        "DELETE FROM ingested_newsletters "
+        "WHERE user_id = ? AND entry_url IS NOT NULL AND source_id IN "
+        "(SELECT id FROM sources WHERE user_id = ? AND source_type = 'rss' AND active = 1)",
+        (user_id, user_id),
+    )
+    db.commit()
+    return cur.rowcount
+
+
 def fetch_rss_source(
     db: sqlite3.Connection,
     user_id: int,
@@ -109,6 +125,15 @@ def fetch_rss_source(
     result: dict[str, Any] = {"new": 0, "skipped": 0, "error": None}
 
     try:
+        # TTL: expire entries older than 7 days so they can be re-ingested
+        db.execute(
+            "DELETE FROM ingested_newsletters "
+            "WHERE user_id = ? AND source_id = ? AND entry_url IS NOT NULL "
+            "AND ingested_at < strftime('%Y-%m-%dT%H:%M:%SZ', 'now', ?)",
+            (user_id, source_id, f"-{DEDUP_TTL_DAYS} days"),
+        )
+        db.commit()
+
         req = Request(feed_url, headers={"User-Agent": USER_AGENT})
         with urlopen(req, timeout=FETCH_TIMEOUT) as resp:
             xml_bytes = resp.read()
@@ -170,8 +195,15 @@ def fetch_rss_source(
 def fetch_all_rss_sources(
     db: sqlite3.Connection,
     user_id: int,
+    force: bool = False,
 ) -> dict[str, Any]:
-    """Fetch all active RSS sources for a user."""
+    """Fetch all active RSS sources for a user.
+
+    If force=True, clears all seen articles first so everything is re-ingested.
+    """
+    if force:
+        clear_seen_articles(db, user_id)
+
     sources = db.execute(
         "SELECT id, name, url FROM sources "
         "WHERE user_id = ? AND source_type = 'rss' AND active = 1 AND url IS NOT NULL",
@@ -194,6 +226,7 @@ def fetch_all_rss_sources(
         summary["results"].append({
             "source_id": src["id"],
             "name": src["name"],
+            "url": src["url"],
             "new": r["new"],
             "skipped": r["skipped"],
             "error": r["error"],

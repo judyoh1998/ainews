@@ -84,9 +84,13 @@
     </div>
 
     <!-- Fetch Latest -->
+    <div style="margin-bottom:8px;">
+      <button class="nk-ingest-btn" onclick="doFetchRss()" id="fetchBtn">FETCH LATEST</button>
+      <button class="nk-ingest-btn" onclick="doForceRefetch()" id="forceFetchBtn" style="background:linear-gradient(90deg,#f472b6,#fb7185);">FORCE RE-FETCH</button>
+    </div>
     <div style="margin-bottom:16px;">
-      <button class="nk-ingest-btn" onclick="doFetchRss()" id="fetchBtn">FETCH LATEST FROM RSS</button>
       <span id="fetchStatus" class="nk-status-msg"></span>
+      <div id="fetchErrors" style="font-size:6px;color:#991b1b;margin-top:4px;line-height:1.8;display:none;"></div>
     </div>
 
     <!-- Digest Cadence -->
