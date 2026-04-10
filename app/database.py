@@ -133,6 +133,15 @@ def init_db():
     ]
     for pattern in _remove_urls:
         conn.execute("DELETE FROM sources WHERE url LIKE ?", (pattern,))
+    # Remove any RSS sources whose URL is not in the current catalog
+    from app.services.seed_data import RSS_CATALOG
+    catalog_urls = {e["url"] for e in RSS_CATALOG}
+    all_rss = conn.execute(
+        "SELECT id, url FROM sources WHERE source_type = 'rss' AND url IS NOT NULL"
+    ).fetchall()
+    for row in all_rss:
+        if row["url"] not in catalog_urls:
+            conn.execute("DELETE FROM sources WHERE id = ?", (row["id"],))
     conn.commit()
 
 
