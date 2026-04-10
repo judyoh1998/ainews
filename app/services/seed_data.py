@@ -148,10 +148,27 @@ SEED_SOURCES = [
 ]
 
 RSS_CATALOG = [
-    # News outlets
     {
-        "name": "MIT Technology Review - AI",
-        "url": "https://www.technologyreview.com/topic/artificial-intelligence/feed",
+        "name": "OpenAI",
+        "url": "https://openai.com/news/rss.xml",
+        "source_type": "rss",
+        "category": "labs",
+    },
+    {
+        "name": "Google AI Blog",
+        "url": "https://blog.google/technology/ai/rss",
+        "source_type": "rss",
+        "category": "labs",
+    },
+    {
+        "name": "Wired - AI",
+        "url": "https://www.wired.com/feed/tag/ai/latest/rss",
+        "source_type": "rss",
+        "category": "news",
+    },
+    {
+        "name": "MIT News - AI",
+        "url": "https://news.mit.edu/rss/topic/artificial-intelligence2",
         "source_type": "rss",
         "category": "news",
     },
@@ -168,66 +185,15 @@ RSS_CATALOG = [
         "category": "news",
     },
     {
-        "name": "Ars Technica",
-        "url": "https://feeds.arstechnica.com/arstechnica/features",
+        "name": "VentureBeat - AI",
+        "url": "https://venturebeat.com/category/ai/feed",
         "source_type": "rss",
         "category": "news",
     },
-    # AI Labs
     {
-        "name": "OpenAI Blog",
-        "url": "https://openai.com/index/rss.xml",
+        "name": "Ars Technica - AI",
+        "url": "https://arstechnica.com/ai/feed/",
         "source_type": "rss",
-        "category": "labs",
-    },
-    {
-        "name": "Anthropic News",
-        "url": "https://www.anthropic.com/rss.xml",
-        "source_type": "rss",
-        "category": "labs",
-    },
-    {
-        "name": "Google AI Blog",
-        "url": "https://blog.google/technology/ai/rss",
-        "source_type": "rss",
-        "category": "labs",
-    },
-    {
-        "name": "Hugging Face Blog",
-        "url": "https://huggingface.co/blog/feed.xml",
-        "source_type": "rss",
-        "category": "labs",
-    },
-    {
-        "name": "DeepMind Blog",
-        "url": "https://deepmind.google/blog/rss/",
-        "source_type": "rss",
-        "category": "labs",
-    },
-    {
-        "name": "Meta Engineering",
-        "url": "https://engineering.fb.com/feed/",
-        "source_type": "rss",
-        "category": "labs",
-    },
-    # Community
-    {
-        "name": "r/MachineLearning",
-        "url": "https://www.reddit.com/r/MachineLearning/.rss",
-        "source_type": "rss",
-        "category": "community",
-    },
-    {
-        "name": "r/artificial",
-        "url": "https://www.reddit.com/r/artificial/.rss",
-        "source_type": "rss",
-        "category": "community",
-    },
-    # Research
-    {
-        "name": "ArXiv CS.AI",
-        "url": "https://rss.arxiv.org/rss/cs.AI",
-        "source_type": "rss",
-        "category": "research",
+        "category": "news",
     },
 ]

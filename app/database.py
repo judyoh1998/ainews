@@ -108,19 +108,31 @@ def init_db():
     )
     # Fix broken catalog URLs for existing users
     _url_fixes = [
-        ("https://ai.meta.com/blog/rss/", "https://engineering.fb.com/feed/"),
-        ("https://openai.com/blog/rss.xml", "https://openai.com/index/rss.xml"),
-        ("https://deepmind.google/blog/rss.xml", "https://deepmind.google/blog/rss/"),
+        ("https://ai.meta.com/blog/rss/", None),  # removed
+        ("https://openai.com/blog/rss.xml", "https://openai.com/news/rss.xml"),
+        ("https://openai.com/index/rss.xml", "https://openai.com/news/rss.xml"),
+        ("https://deepmind.google/blog/rss.xml", None),  # removed
+        ("https://deepmind.google/blog/rss/", None),  # removed
         ("https://blog.google/technology/ai/rss/", "https://blog.google/technology/ai/rss"),
+        ("https://feeds.arstechnica.com/arstechnica/features", "https://arstechnica.com/ai/feed/"),
+        ("https://www.technologyreview.com/topic/artificial-intelligence/feed", None),  # removed
     ]
     for old_url, new_url in _url_fixes:
-        conn.execute(
-            "UPDATE sources SET url = ? WHERE url = ?", (new_url, old_url)
-        )
-    # Remove all Nitter/Twitter sources (unreliable, systematically blocked)
-    conn.execute(
-        "DELETE FROM sources WHERE url LIKE '%nitter.poast.org%'"
-    )
+        if new_url:
+            conn.execute("UPDATE sources SET url = ? WHERE url = ?", (new_url, old_url))
+        else:
+            conn.execute("DELETE FROM sources WHERE url = ?", (old_url,))
+    # Remove retired sources
+    _remove_urls = [
+        "%nitter.poast.org%",
+        "%anthropic.com/rss%",
+        "%huggingface.co/blog%",
+        "%engineering.fb.com%",
+        "%reddit.com/r/%",
+        "%arxiv.org%",
+    ]
+    for pattern in _remove_urls:
+        conn.execute("DELETE FROM sources WHERE url LIKE ?", (pattern,))
     conn.commit()
 
 
